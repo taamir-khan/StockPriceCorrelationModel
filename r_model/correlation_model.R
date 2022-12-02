@@ -79,6 +79,8 @@ df_list <- list(industry_corr, environmental_corr, governance_corr, social_corr)
 correlation_table <- df_list %>% reduce(full_join, by='ticker')
 colnames(correlation_table) <- c('ticker', 'industryAdjustedScore','environmentalPillarScore', 'governancePillarScore', 'socialPillarScore')
 
-write.csv(correlation_table,"/Users/sin/Desktop/senior design/r_model/Output/correlation_table.csv", row.names = FALSE)
+#write.csv(correlation_table,"/Users/sin/Desktop/senior design/r_model/Output/correlation_table.csv", row.names = FALSE)
+write.csv(df3,"/Users/sin/Desktop/senior design/r_model/Output/merged_data.csv", row.names = FALSE)
+
 
 
