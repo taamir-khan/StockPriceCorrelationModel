@@ -5,12 +5,16 @@ from sklearn import linear_model
 
 #replace with name of any csv file
 #Note: must be a csv file, not excel (convert excel file to csv)
-df = pd.read_csv(r'C:\Users\Agasti Mhatre\Desktop\MSCI Test\testLYB.csv')
-df.dropna(axis = 0, how = 'any', thresh = None, subset = None, inplace = True)
+df = pd.read_csv(r'C:\Users\Agasti Mhatre\Desktop\MSCI Test\merged_data.csv')
+#df.dropna(axis = 0, how = 'any', thresh = None, subset = None, inplace = True)
+df.groupby(by='ticker')
 pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
 
 ###correlation between each individual factor and price
-factors = ['INDUSTRY_ADJUSTED_SCORE', 'ENVIRONMENTAL_PILLAR_SCORE', 'GOVERNANCE_PILLAR_SCORE', 'SOCIAL_PILLAR_SCORE']
+
+
+factors = ['industryAdjustedScore', 'environmentalPillarScore', 'goverancePillarScore', 'socialPillarScore']
 model = linear_model.LinearRegression()
 
 factor = 0
@@ -18,16 +22,16 @@ factor = 0
 #ouput correlations coefficients to text_file
 output_ = r'C:\Users\Agasti Mhatre\Desktop\MSCI Test\correlation.txt'
 output = open(output_, 'w')
-output.write(str(df.corr()))
+output.write(str(df.groupby('ticker').corr()))
 output.close()
 
 
 #graph each relationship using matplotlib
 while factor < len(factors):
-    curr = ['Month, Year', 'Average Price (in dollars)'] + factors[factor + 1:] + factors[:factor]
+    curr = ['Month', 'Year', 'price', 'ticker', 'isinID', 'weightedAvgScore'] + factors[factor + 1:] + factors[:factor]
 
     X = df.drop(curr, axis=1)
-    Y = df['Average Price (in dollars)']
+    Y = df['price']
 
     model.fit(X, Y)
 
@@ -44,5 +48,5 @@ while factor < len(factors):
     factor += 1
 
 
-# works cited: https://realpython.com/linear-regression-in-python/#regression'''
+# works cited: https://realpython.com/linear-regression-in-python/#regression
 # works cited: https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
