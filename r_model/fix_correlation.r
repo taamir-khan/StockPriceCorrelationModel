@@ -3,6 +3,7 @@ library(dplyr)
 library(corrr)
 library(tidyverse)
 
+setwd("/Users/sin/Desktop/senior design/StockPriceCorrelationModel/r_model/Data")
 # reads MSCIdata file
 msciData <- read.csv(file="MSCIData_2014_to_2018_2021_to_2022.csv")
 
