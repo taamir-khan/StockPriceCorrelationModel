@@ -133,7 +133,7 @@ ADP_Social_Graph <- plot_ly(ADP_msci_scores, x= ~YearMonth, y= ~ADP_Social_Score
 # 3. US0200021014  ALL  0.9203513
 # Price
 ALL_all_info <- df[df$isinID == 'US0200021014',]
-ALL_table <- data.frame(MAA_all_info)
+ALL_table <- data.frame(ALL_all_info)
 
 Date <- ALL_table$priceDate
 Dates_Formatted <-as.Date(as.character(Date),format="%Y%m%d")
@@ -156,7 +156,7 @@ ALL_Social_Graph <- plot_ly(ALL_msci_scores, x= ~YearMonth, y= ~ALL_Social_Score
 # 1. US57060D1081  MKTX  -0.9644047
 # Price
 MKTX_all_info <- df[df$isinID == 'US57060D1081',]
-MKTX_table <- data.frame(MAA_all_info)
+MKTX_table <- data.frame(MKTX_all_info)
 
 Date <- MKTX_table$priceDate
 Dates_Formatted <-as.Date(as.character(Date),format="%Y%m%d")
