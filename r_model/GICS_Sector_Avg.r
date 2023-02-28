@@ -1,3 +1,6 @@
+library(zoom)
+library(plotly)
+
 # GICS AVERAGE
 
 # reads in resultant MSCI Correlation Data
@@ -50,6 +53,43 @@ entire_joined_sectors_avg <- merge(joined_enviro_and_social, goverance_sector_av
 
 # write the merged data to a csv file
 #write.csv(entire_joined_sectors_avg,"/Users/KatePiotrowski/Correlation_Model/Data_Output/GICS_Sector_MSCI_Correlation_Avg.csv", row.names = FALSE)
+
+#------------------------------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------------------------------
+# create bar graph
+
+# ENVIRO GRAPH
+jpeg(file="testing_E_graph.jpeg")
+
+
+#g <- ggplot(mpg, aes(class))  
+#p <-  g + geom_bar()
+
+#ggplotly(p)
+
+g <- ggplot(environmental_sector_avg, aes(sector_level_1))  
+p <-  g + geom_bar()
+
+ggplotly(p)
+
+e_graph <- plot_ly(environmental_sector_avg$environmental_correlation,
+        main = "ENVIRONMENTAL: GICS Sector Avg of MSCI to Price Correlations",
+        xlab = "Sector",
+        ylab = "Average Correlation",
+        names.arg = c("Communication Services", 
+                      "Consumer Discretionary", 
+                      "Consumer Staples", 
+                      "Energy", 
+                      "Financials", 
+                      "Health Care",
+                      "Industrials",
+                      "Information Technology",
+                      "Materials",
+                      "Real Estate",
+                      "Utilities"),
+        col = "light green")
+
+dev.off()
 
 
 
