@@ -4,7 +4,7 @@ library(plotly)
 # GICS AVERAGE
 
 # reads in resultant MSCI Correlation Data
-MSCI_Correlation_Data <- read.csv(file= "/Users/KatePiotrowski/Correlation_Model/Data_Output/fixed_10_Years_Correlation_Table.csv")
+MSCI_Correlation_Data <- read.csv(file= "/Users/sin/Desktop/school/Senior Design/StockPriceCorrelationModel/r_model/Output/fixed_10_Years_Correlation_Table.csv")
 
 # assign variables
 isin_ID <- MSCI_Correlation_Data$isinID
@@ -17,7 +17,7 @@ msci_correlation <- data.frame(isin_ID, environmental_correlation, social_correl
 #------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------
 # reads in GICS Sectors csv file
-GICS_Sectors <- read.csv(file = "/Users/KatePiotrowski/Correlation_Model/Data_Input/GICS_Sectors.csv")
+GICS_Sectors <- read.csv(file = "/Users/sin/Desktop/school/Senior Design/StockPriceCorrelationModel/r_model/Data/GICS_Sectors.csv")
 
 # assign variables
 isin_ID <- GICS_Sectors$ISIN_CD
@@ -58,38 +58,13 @@ entire_joined_sectors_avg <- merge(joined_enviro_and_social, goverance_sector_av
 #------------------------------------------------------------------------------------------------------------------------------
 # create bar graph
 
-# ENVIRO GRAPH
-jpeg(file="testing_E_graph.jpeg")
+fig <- plot_ly(entire_joined_sectors_avg, x = ~sector_level_1, y = ~environmental_correlation, type = 'bar', name = 'environmental', color = 'light green')
+fig <- fig %>% add_trace(y = ~social_correlation, name = 'Social', color = 'light yellow')
+fig <- fig %>% add_trace(y = ~social_correlation, name = 'Governance', color = 'light blue')
+fig <- fig %>% layout(yaxis = list(title = 'Correlation Coefficient'), barmode = 'stack')
 
+fig
 
-#g <- ggplot(mpg, aes(class))  
-#p <-  g + geom_bar()
-
-#ggplotly(p)
-
-g <- ggplot(environmental_sector_avg, aes(sector_level_1))  
-p <-  g + geom_bar()
-
-ggplotly(p)
-
-e_graph <- plot_ly(environmental_sector_avg$environmental_correlation,
-        main = "ENVIRONMENTAL: GICS Sector Avg of MSCI to Price Correlations",
-        xlab = "Sector",
-        ylab = "Average Correlation",
-        names.arg = c("Communication Services", 
-                      "Consumer Discretionary", 
-                      "Consumer Staples", 
-                      "Energy", 
-                      "Financials", 
-                      "Health Care",
-                      "Industrials",
-                      "Information Technology",
-                      "Materials",
-                      "Real Estate",
-                      "Utilities"),
-        col = "light green")
-
-dev.off()
 
 
 
