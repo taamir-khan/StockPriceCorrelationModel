@@ -5,22 +5,20 @@ from sklearn import linear_model
 
 #replace with name of any csv file
 #Note: must be a csv file, not excel (convert excel file to csv)
-df = pd.read_csv(r'C:\Users\Agasti Mhatre\Desktop\MSCI Test\merged_data.csv')
-#df.dropna(axis = 0, how = 'any', thresh = None, subset = None, inplace = True)
-df.groupby(by='ticker')
+df = pd.read_csv(r'merged_data.csv')
+
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 
 ###correlation between each individual factor and price
-
 
 factors = ['industryAdjustedScore', 'environmentalPillarScore', 'goverancePillarScore', 'socialPillarScore']
 model = linear_model.LinearRegression()
 
 factor = 0
 
-#ouput correlations coefficients to text_file
-output_ = r'C:\Users\Agasti Mhatre\Desktop\MSCI Test\correlation.txt'
+#output correlations coefficients to text_file
+output_ = r'correlation.txt'
 output = open(output_, 'w')
 output.write(str(df.groupby('ticker').corr()))
 output.close()
@@ -50,3 +48,4 @@ while factor < len(factors):
 
 # works cited: https://realpython.com/linear-regression-in-python/#regression
 # works cited: https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html
+
