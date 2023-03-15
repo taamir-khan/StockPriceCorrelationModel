@@ -1,0 +1,86 @@
+New VM Configuration
+
+On creation ran: 
+	sudo apt upgrade
+	sudo apt update
+	sudo apt install python3
+	sudo apt install git
+
+	#Create a workspace
+	mkdir workshop
+
+
+	Create new personal access token (not fine-grained), ensure it has repo rights
+	git clone https://github.com/taamir-khan/StockPriceCorrelationModel.git
+
+
+
+Connecting VM to MySQL Instance
+
+	https://cloud.google.com/sql/docs/mysql/connect-compute-engine#connect-gce-private-ip
+	https://cloud.google.com/compute/docs/instances/sql-server/setup-mysql
+
+	Installing mySql client on Compute Engine Instance
+		Downlading MySQL Community Server for platform from 
+
+		Servicing Network API must be enabled
+		https://console.cloud.google.com/apis/library/servicenetworking.googleapis.com?project=fbex01
+
+
+		Install MySQL 8 on GCloud VM
+			sudo apt-get install -y wget
+
+				Download the MySQL Community Server release package
+					export DEB_FILE=mysql-apt-config_0.8.20-1_all.deb
+		cd /tmp
+		curl -L --output ${DEB_FILE} \
+		     https://dev.mysql.com/get/${DEB_FILE}
+
+		     	Verify the integrity of the release package file.
+
+		     		cat > ${DEB_FILE}.md5 << EOL
+799bb0aefb93d30564fa47fc5d089aeb ${DEB_FILE}
+EOL
+md5sum --check ${DEB_FILE}.md5
+
+
+	sudo apt-get update && sudo apt-get dist-upgrade
+
+
+		To connect to DB
+
+		After turning on
+			https://console.cloud.google.com/sql/instances/uconn-ssga/overview?project=fbex01&cloudshell=true
+
+		gcloud sql connect uconn-ssga --user=root --quiet
+
+
+		password: uconnstamford
+
+
+
+Ip Addresses:
+	VM Primary Internal:
+		10.128.0.2
+
+	VM External IP:
+		34.133.86.225
+
+	DB Public IP:
+		34.138.188.252
+
+
+
+Essential Python/SQL installations:
+	
+	sudo apt install python3-pip
+	pip3 install mysql-connector
+	sudo apt install emacs
+
+
+
+
+
+
+
+
