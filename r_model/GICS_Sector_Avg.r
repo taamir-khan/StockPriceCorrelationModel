@@ -9,12 +9,31 @@ Price_Data <- read.csv(file="/Users/KatePiotrowski/Correlation_Model/Data_Input/
 # assigns variables for ticker and isin_ID
 ticker <- Price_Data$BB_TICKER_CD
 isin_ID <- Price_Data$ISIN_CD
+price_date <- Price_Data$DATE_DIM_ID
 
 # creates data frame with ticker and isin_ID
-tickers_with_isin_ID <- data.frame(ticker, isin_ID)
+tickers_with_isin_ID <- data.frame(ticker, isin_ID, price_date)
+
+# retrieves the Month as a new variable from the given date
+tickers_with_isin_ID$Month <- format(as.Date(price_date, format="%Y%m%d"),"%m")
+
+# retrieves the Year as a new variable from the given date
+tickers_with_isin_ID$Year <- format(as.Date(price_date, format="%Y%m%d"),"%Y")
+
+tickers_with_isin_ID$Full_Date <- as.Date(format(as.Date(price_date, format="%Y%m%d")))
+
+tickers_with_isin_ID[order(as.Date(tickers_with_isin_ID$Date, format="%Y%m%d"))]
 
 # determines only the distinct tickers
 tickers_with_isin_ID <- distinct(tickers_with_isin_ID, .keep_all = FALSE)
+
+# Gets the Date Range of Price Per Ticker
+date_range <- tickers_with_isin_ID %>%
+  group_by(ticker) %>%
+  summarize(start_date = min(Full_Date), end_date = max(Full_Date))
+
+date_range <- date_range[-1,]
+
 #------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------
 # This portion of code begins calculating the GICS Sector Average Roll-Up
@@ -63,19 +82,7 @@ std_dev_by_sector <- joined %>%
     gov_score_std_dev = sd(goverance_correlation, na.rm = TRUE)
   )
 
-# Calculate mean and standard deviation by sector for each score
-# score_stats_by_sector <- joined %>%
-#   group_by(sector_level_1) %>%
-#   summarise(
-#     env_score_mean = mean(environmental_correlation, na.rm = TRUE),
-#     env_score_std_dev = sd(environmental_correlation, na.rm = TRUE),
-#     soc_score_mean = mean(environmental_correlation, na.rm = TRUE),
-#     soc_score_std_dev = sd(social_correlation, na.rm = TRUE),
-#     gov_score_mean = mean(goverance_correlation, na.rm = TRUE),
-#     gov_score_std_dev = sd(goverance_correlation, na.rm = TRUE)
-#   )
-
-# Calculate the standard deviation for each factor
+# Calculate the standard deviation for each factor (ESG)
 std_dev_env <- sd(joined$environmental_correlation, na.rm = TRUE)
 std_dev_soc <- sd(joined$social_correlation, na.rm = TRUE)
 std_dev_gov <- sd(joined$goverance_correlation, na.rm = TRUE)
@@ -103,28 +110,13 @@ ordered <- c("ticker", "isin_ID", "environmental_correlation",
 
 # Final Output of the List of Outliers
 ordered <- outliers_with_tickers[, ordered]
+ordered <- distinct(ordered, .keep_all = FALSE)
 
 # Write the outliers to csv file
 #write.csv(ordered,"/Users/KatePiotrowski/Correlation_Model/Data_Output/Outliers_GICS_Sector_Avg.csv", row.names = FALSE)
-
-# Calculate z-scores for each score and filter outliers
-# testing <- joined %>%
-#   left_join(score_stats_by_sector, by = "sector_level_1") %>%
-#   mutate(
-#     env_score_z = (environmental_correlation - env_score_mean) / env_score_std_dev,
-#     soc_score_z = (social_correlation - soc_score_mean) / soc_score_std_dev,
-#     gov_score_z = (goverance_correlation - gov_score_mean) / gov_score_std_dev
-#   ) %>%
-#   filter(
-#     (env_score_z >= -1 & env_score_z <= 1) &
-#       (soc_score_z >= -1 & soc_score_z <= 1) &
-#       (gov_score_z >= -1 & gov_score_z <= 1)
-#   ) %>%
-#   select(-contains("mean"), -contains("std_dev"), -contains("z"))
 #------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------------------------------
-# Getting the Sector Avg WITHOUT outlier data
+# Getting the Sector Avg WITHOUT outlier data (use this to create data mining graph)
 
 # Getting the Environmental Sector Avg with aggregation 
 no_outliers_environmental_sector_avg <- aggregate(environmental_correlation ~ sector_level_1, data = outliers, mean)
@@ -136,7 +128,7 @@ no_outliers_social_sector_avg <- aggregate(social_correlation ~ sector_level_1, 
 no_outliers_goverance_sector_avg <- aggregate(goverance_correlation ~ sector_level_1, data = outliers, mean)
 
 #------------------------------------------------------------------------------------------------------------------------------
-# Getting the Sector Avg WITH outliers
+# Getting the Sector Avg WITH outliers (ALL OF THE DATA)
 
 # Getting the Environmental Sector Avg with aggregation
 environmental_sector_avg <- aggregate(environmental_correlation ~ sector_level_1, data = joined, mean)
@@ -149,7 +141,7 @@ goverance_sector_avg <- aggregate(goverance_correlation ~ sector_level_1, data =
 
 #------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------
-# WITH OUTLIERS
+# WITH OUTLIERS (ALL OF THE DATA)
 # merging each E, S, G sector avg table into one table
 
 # first merge Environmental and Social Averages
@@ -173,8 +165,7 @@ no_outliers_entire_joined_sectors_avg <- merge(no_outliers_joined_enviro_and_soc
 #------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------
 #------------------------------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------------------------------
-# Join together joined and entire_joined_sectors_avg to display each Correlation by Sector
+# Join together joined and entire_joined_sectors_avg to display each Correlation by SECTOR
 
 display_sector_avg_with_esg_correlation_per_stock <- entire_joined_sectors_avg %>% inner_join(joined, join_by(sector_level_1 == sector_level_1), multiple = "all")
 
@@ -196,100 +187,48 @@ rename_display_sector_avg_with_esg_correlation_per_stock <- with_std_sector_avg_
                                                                      "Gov_Sector_Sd" = "gov_score_std_dev")
 
 rename_display_sector_avg_with_esg_correlation_per_stock <- rename_display_sector_avg_with_esg_correlation_per_stock[, c(1, 5, 2, 3, 4, 6, 7, 8, 9, 10, 11)]
-
 #------------------------------------------------------------------------------------------------------------------------------
-#filter(abs(Enviro_Corr - Enviro_Corr_Sector_Avg) > env_score_std_dev)
-apply(rename_display_sector_avg_with_esg_correlation_per_stock,  )
-
-
-
-
-
-stats_by_sector <- rename_display_sector_avg_with_esg_correlation_per_stock %>%
-  group_by(Sector) %>%
-  summarise(
-    sector_env_score_std_dev = sd(environmental_correlation, na.rm = TRUE),
-    sector_soc_score_std_dev = sd(social_correlation, na.rm = TRUE),
-    sector_gov_score_std_dev = sd(goverance_correlation, na.rm = TRUE)
-  )
-
-env_score_mean <- mean(Enviro_Corr, na.rm = TRUE)
-env_score_std_dev <- sd(Enviro_Corr, na.rm = TRUE)
-
-soc_score_mean <- mean(Social_Corr, na.rm = TRUE)
-soc_score_std_dev <- sd(Social_Corr, na.rm = TRUE)
-
-gov_score_mean <- mean(Gov_Corr, na.rm = TRUE)
-gov_score_std_dev <- sd(Gov_Corr, na.rm = TRUE)
-
-stats_by_sector <- rename_display_sector_avg_with_esg_correlation_per_stock %>%
-    group_by(Sector) %>%
-    summarise(
-      env_score_mean = mean(Enviro_Corr, na.rm = TRUE),
-      env_score_std_dev = sd(Enviro_Corr, na.rm = TRUE),
-      
-      soc_score_mean = mean(Social_Corr, na.rm = TRUE),
-      soc_score_std_dev = sd(Social_Corr, na.rm = TRUE),
-      
-      gov_score_mean = mean(Gov_Corr, na.rm = TRUE),
-      gov_score_std_dev = sd(Gov_Corr, na.rm = TRUE)
-)
-
 # Filter out correlation coefficients greater than one standard deviation for each factor
-outliers_env <- rename_display_sector_avg_with_esg_correlation_per_stock %>% filter(abs(Enviro_Corr - Enviro_Corr_Sector_Avg) > env_score_std_dev)
-outliers_soc <- rename_display_sector_avg_with_esg_correlation_per_stock %>% filter(abs(Social_Corr - Social_Corr_Sector_Avg) > soc_score_std_dev)
-outliers_gov <- rename_display_sector_avg_with_esg_correlation_per_stock %>% filter(abs(Gov_Corr - Gov_Corr_Sector_Avg) > gov_score_std_dev)
+outliers_env_by_sector <- rename_display_sector_avg_with_esg_correlation_per_stock %>% filter(abs(Enviro_Corr_Sector_Avg - Enviro_Corr) > Env_Sector_Sd)
+outliers_soc_by_sector <- rename_display_sector_avg_with_esg_correlation_per_stock %>% filter(abs(Social_Corr_Sector_Avg - Social_Corr) > Social_Sector_Sd)
+outliers_gov_by_sector <- rename_display_sector_avg_with_esg_correlation_per_stock %>% filter(abs(Gov_Corr_Sector_Avg - Gov_Corr) > Gov_Sector_Sd)
+
+# Combine outliers into a single data frame
+outliers_by_sector <- bind_rows(outliers_env_by_sector, outliers_soc_by_sector, outliers_gov_by_sector)
+
+# Remove duplicates if any
+outliers_by_sector <- distinct(outliers_by_sector)
+
+# add Ticker to data frame
+outliers_by_sector_with_tickers <- outliers_by_sector %>% merge(tickers_with_isin_ID, by= 'isin_ID')
+
+# Reorder the columns
+final_outliers_by_sector <- c("ticker", 
+                     "isin_ID", 
+                     "Sector",
+                     "Enviro_Corr_Sector_Avg",
+                     "Enviro_Corr", 
+                     "Env_Sector_Sd",
+                     "Social_Corr_Sector_Avg",
+                     "Social_Corr", 
+                     "Social_Sector_Sd",
+                     "Gov_Corr_Sector_Avg",
+                     "Gov_Corr", 
+                     "Gov_Sector_Sd")
+
+# Final Output of the List of Outliers By Sector
+final_outliers_by_sector <- outliers_by_sector_with_tickers[, final_outliers_by_sector]
+
+final_outliers_by_sector <- distinct(final_outliers_by_sector, .keep_all = FALSE)
+
+# Merge Date Range with final_outliers_by_sector
+final_outliers_by_sector_with_date_range <- merge(date_range, final_outliers_by_sector, by="ticker")
+
+# Write to CSV File
+#write.csv(final_outliers_by_sector_with_date_range,"/Users/KatePiotrowski/Correlation_Model/Data_Output/Outliers_By_GICS_Sector.csv", row.names = FALSE)
 
 
-#------------------------------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------------------------------
 
 
-
-# create bar graph
-# review display (maybe delete)
-
-# ENVIRO GRAPH
-jpeg(file="testing_E_graph.jpeg")
-
-
-#g <- ggplot(mpg, aes(class))  
-#p <-  g + geom_bar()
-
-#ggplotly(p)
-
-g <- ggplot(environmental_sector_avg, aes(sector_level_1))  
-p <-  g + geom_bar()
-
-ggplotly(p)
-
-e_graph <- plot_ly(environmental_sector_avg$environmental_correlation,
-        main = "ENVIRONMENTAL: GICS Sector Avg of MSCI to Price Correlations",
-        xlab = "Sector",
-        ylab = "Average Correlation",
-        names.arg = c("Communication Services", 
-                      "Consumer Discretionary", 
-                      "Consumer Staples", 
-                      "Energy", 
-                      "Financials", 
-                      "Health Care",
-                      "Industrials",
-                      "Information Technology",
-                      "Materials",
-                      "Real Estate",
-                      "Utilities"),
-        col = "light green")
-
-dev.off()
-
-
-# create bar graph
-
-fig <- plot_ly(entire_joined_sectors_avg, x = ~sector_level_1, y = ~environmental_correlation, type = 'bar', name = 'environmental', color = 'light green')
-fig <- fig %>% add_trace(y = ~social_correlation, name = 'Social', color = 'light yellow')
-fig <- fig %>% add_trace(y = ~social_correlation, name = 'Governance', color = 'light blue')
-fig <- fig %>% layout(yaxis = list(title = 'Correlation Coefficient'), barmode = 'stack')
-
-fig
 
 
