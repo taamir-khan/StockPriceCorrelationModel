@@ -80,10 +80,34 @@ Essential Python/SQL installations:
 	pip3 install pandas
 	pip3 install scikit-learn
 	pip3 install matplotlib
+	pip3 install rpy2
+
+
+Essential R installations:
+
+	sudo apt install r-base
+	
+
+   * After installing the R compiler, enter the command "R" in the terminal to launch the R shell.
+   * Install the following packages by entering each command and then hitting Enter (type 'yes' to additional questions)
+	- install.packages("stringr")
+	- install.packages('data.table')
+	- install.packages('dplyr')
+	- install.packages('corrr')
+	- install.packages('tidyverse')
 
 
 
 
+############################################ none of this is used. just ideas
+sudo apt-get install unixodbc unixodbc-dev
+
+	- install.packages("odbc")
+	- install.packages("rstudioapi")
+	- install.packages("DBI")
+	- install.packages("RMySQL")
+
+https://cran.r-project.org/web/packages/odbc/readme/README.html#connecting-to-a-database
 
 
 
