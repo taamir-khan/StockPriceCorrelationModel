@@ -77,6 +77,12 @@ update_df3 <- df3[,-c(6,8)]
 
 # reorder columns 
 TruCost_With_Price <- update_df3[, c(1, 2, 3, 4, 8, 5, 6, 7, 9)]
+
+# data frame of ticker and isin_ID
+Ticker_and_isinID <- update_df3[, c(1, 2)]
+
+# get distinct values of ticker and isin_ID
+distinct_ticker_isinID <- Ticker_and_isinID %>% distinct()
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # Determine Correlations
@@ -97,9 +103,17 @@ df_list <- list(carbon_intensity_direct_and_first_tier_indirect_corr, carbon_emi
 trucost_correlation_table <- df_list %>% reduce(full_join, by='isin_ID')
 colnames(trucost_correlation_table) <- c('isin_ID', 'carbon_intensity_direct_and_first_tier_indirect_corr', 'carbon_emissions_scope_1_corr', 'carbon_emissions_scope_2_corr')
 
+# add Ticker to display on final data frame
+#trucost_correlation_table_with_tickers <- cbind(trucost_correlation_table, ticker = TruCost_With_Price$ticker)
+
+joined <- merge(distinct_ticker_isinID, trucost_correlation_table, by="isin_ID")
+
+
 # filter out 1's and -1's
-my_data_filtered <- trucost_correlation_table[!apply(trucost_correlation_table[, c('carbon_intensity_direct_and_first_tier_indirect_corr', 'carbon_emissions_scope_1_corr', 'carbon_emissions_scope_2_corr')] == 1, 1, any), ]
+#my_data_filtered <- trucost_correlation_table[!apply(trucost_correlation_table[, c('carbon_intensity_direct_and_first_tier_indirect_corr', 'carbon_emissions_scope_1_corr', 'carbon_emissions_scope_2_corr')] == 1, 1, any), ]
 
 #updated_filter <- my_data_filtered[!apply(my_data_filtered[, c('carbon_intensity_direct_and_first_tier_indirect_corr', 'carbon_emissions_scope_1_corr', 'carbon_emissions_scope_2_corr')] == -1, -1, any), ]
 
+# Write to CSV File
+#write.csv(trucost_correlation_table,"/Users/KatePiotrowski/Correlation_Model/Data_Output/TruCost_to_Price_Correlation.csv", row.names = FALSE)
 
