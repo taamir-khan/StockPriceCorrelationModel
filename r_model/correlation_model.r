@@ -27,6 +27,10 @@ df2$Month <- format(as.Date(msciDate, format="%Y-%m-%d"),"%m")
 df2$Year <- format(as.Date(msciDate, format="%Y-%m-%d"),"%Y")
 
 df2[order(as.Date(df2$Date, format="%Y-%m-%d"))]
+
+# Remove rows with NA values in the relevant columns
+df2 <- na.omit(df2[, c("environmentalPillarScore", "goverancePillarScore", "socialPillarScore", "isinID", "Month", "Year")])
+
 group_mean2 <- aggregate(cbind(environmentalPillarScore, goverancePillarScore, socialPillarScore) ~ isinID+Month+Year, data = df2, mean)
 #group_mean2
 
