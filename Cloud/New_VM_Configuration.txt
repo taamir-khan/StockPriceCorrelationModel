@@ -95,6 +95,7 @@ Essential R installations:
 	- install.packages('dplyr')
 	- install.packages('corrr')
 	- install.packages('tidyverse')
+	- install.packages('plotly')
 
 
 
