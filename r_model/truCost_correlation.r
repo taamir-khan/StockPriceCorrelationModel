@@ -107,28 +107,4 @@ merged_data <- merged_data %>%
 # Save the merged data to a CSV file
 write.csv(merged_data, "merged_data.csv", row.names = FALSE)
 
-# Plot graphs
-for (isin in unique(combined_data$ISIN_CD)) {
-  # Filter data for the specific ISIN
-  isin_data <- combined_data %>%
-    filter(ISIN_CD == isin)
-
-  # Price and Carbon Score Plot
-  price_carbon_plot <- ggplot(isin_data, aes(x = as.Date(year_month, format = "%Y-%m"))) +
-    geom_line(aes(y = avg_price, color = "Price")) +
-    geom_line(aes(y = avg_first_tier, color = "Carbon Intensity - Direct & First Tier Indirect")) +
-    geom_line(aes(y = avg_scope1, color = "Carbon Emissions - Scope 1")) +
-    geom_line(aes(y = avg_scope2, color = "Carbon Emissions - Scope 2")) +
-    scale_y_continuous(sec.axis = sec_axis(~ ., name = "Carbon Scores")) +
-    labs(
-      title = paste("Price and Carbon Scores for", isin),
-      x = "Year-Month",
-      y = "Price",
-      color = "Legend"
-    )
-
-  # Save plot as a PNG file
-  ggsave(paste0("price_carbon_scores_", isin, ".png"), plot = price_carbon_plot, width = 10, height = 6, units = "in")
-}
-
                   
