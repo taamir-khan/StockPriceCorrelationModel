@@ -2,7 +2,6 @@
 library(dplyr)
 library(lubridate)
 library(tidyr)
-library(ggplot2)
 
 # Read stock price data
 stock_price_data <- read.csv("PriceData_2012_2022.csv")
