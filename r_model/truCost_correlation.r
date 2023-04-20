@@ -48,9 +48,7 @@ combined_data <- monthly_avg_price %>%
 count_before <- combined_data %>%
   group_by(ISIN_CD) %>%
   summarise(
-    count_scope1_before = sum(!is.na(avg_scope1)),
-    count_scope2_before = sum(!is.na(avg_scope2)),
-    count_first_tier_before = sum(!is.na(avg_first_tier))
+    data_points_before = sum(!is.na(avg_scope1))
   )
 
 # Fill missing carbon scores with the last available value
@@ -62,9 +60,7 @@ combined_data <- combined_data %>%
 count_after <- combined_data %>%
   group_by(ISIN_CD) %>%
   summarise(
-    count_scope1_after = sum(!is.na(avg_scope1)),
-    count_scope2_after = sum(!is.na(avg_scope2)),
-    count_first_tier_after = sum(!is.na(avg_first_tier))
+    data_points_after = sum(!is.na(avg_scope1))
   )
 
 # Combine count data
@@ -74,12 +70,8 @@ data_point_counts <- count_before %>%
 # Remove rows with 0 values in data_point_counts
 data_point_counts <- data_point_counts %>%
   filter(
-    count_scope1_before != 0,
-    count_scope2_before != 0,
-    count_first_tier_before != 0,
-    count_scope1_after != 0,
-    count_scope2_after != 0,
-    count_first_tier_after != 0
+    data_points_before != 0,
+    data_points_after != 0
   )
 
 
@@ -101,6 +93,19 @@ correlations <- combined_data %>%
 
 # Save the final dataframe to a CSV file
 write.csv(correlations, "/Users/sin/Desktop/school/Senior Design/StockPriceCorrelationModel/r_model/Output/truCostCorr.csv", row.names = FALSE)
+
+# Merge the data_point_counts with the correlations
+merged_data <- left_join(correlations, data_point_counts, by = "ISIN_CD")
+
+# Reorder columns to move the data points columns after the ISIN_CD column
+merged_data <- merged_data %>%
+  select(ISIN_CD,
+         data_points_before,
+         data_points_after,
+         everything())
+
+# Save the merged data to a CSV file
+write.csv(merged_data, "merged_data.csv", row.names = FALSE)
 
 # Plot graphs
 for (isin in unique(combined_data$ISIN_CD)) {
